@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jogo da Cobrinha - Player vs Computador</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<h1 class="main-title"> Duelo de Cobrinhas</h1>
+  <div class="game-container">
+    
+    <div id="startScreen" class="start-screen">
+      <h2>Bem-vindo ao Jogo da Cobrinha!</h2>
+      <label for="playerName">Nome do Jogador:</label>
+      <input type="text" id="playerName" placeholder="Digite seu nome" required>
+      <button id="startBtn">Começar Jogo</button>
+    </div>
+
+    <div class="main-game-area" id="gameArea">
+      <canvas id="gameCanvas" width="700" height="400"></canvas>
+      <div class="game-controls">
+        <div class="score-board">
+          <p id="score">Jogador: 0 | Computador: 0</p>
+        </div>
+        <button id="restartBtn">Reiniciar Jogo</button>
+      </div>
+    </div>
+    <div id="rankingBoard" class="ranking-board">
+      <h3>Ranking Top 5</h3>
+      <ol id="rankingList">
+        <li>Carregando...</li>
+      </ol>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
