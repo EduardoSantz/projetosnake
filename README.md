@@ -44,3 +44,4 @@ Esta versão multiplayer traz uma competição única entre jogador e IA:
 1. Clone o repositório:
 ```bash
 git clone [(https://github.com/EduardoSantz/projetosnake)]
+https://github.com/EduardoSantz/projetosnake
