@@ -1,4 +1,5 @@
 (function() {
+  // Elementos principais do jogo
   const canvas = document.getElementById('gameCanvas');
   const ctx = canvas.getContext('2d');
   const startScreen = document.getElementById('startScreen');
@@ -10,50 +11,55 @@
   const restartBtn = document.getElementById('restartBtn');
   const playerNameIn = document.getElementById('playerName');
 
-  const gridSize = 10;
-  const gameSpeed = 100;
+  // Configurações básicas do jogo
+  const gridSize = 10; // Tamanho de cada bloco/segmento da cobra
+  const gameSpeed = 100; // Velocidade de atualização do jogo (em milissegundos)
   let gameInterval, snake, computerSnake, direction, compDirection, food;
   let score, compScore, playerName;
-  let ranking = JSON.parse(localStorage.getItem('ranking')) || [];
+  let ranking = JSON.parse(localStorage.getItem('ranking')) || []; // Carrega ranking salvo
 
-  // Bloqueia a rolagem com as setas
+  // Controles: Bloqueia a rolagem da página com as setas do teclado
   function handleKeyDown(e) {
     if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
       e.preventDefault();
     }
     
-    // Controles da cobra
+    // Atualiza direção da cobra do jogador conforme teclas pressionadas
     if (e.key === 'ArrowUp' && direction.y === 0) direction = { x: 0, y: -gridSize };
     if (e.key === 'ArrowDown' && direction.y === 0) direction = { x: 0, y: gridSize };
     if (e.key === 'ArrowLeft' && direction.x === 0) direction = { x: -gridSize, y: 0 };
     if (e.key === 'ArrowRight' && direction.x === 0) direction = { x: gridSize, y: 0 };
   }
 
-  // Permite usar setas no input
+  // Permite usar setas no campo de nome do jogador
   playerNameIn.addEventListener('keydown', function(e) {
     if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
       e.stopPropagation();
     }
   });
 
-  // Restante do código mantido igual
+  // Funções de desenho básicas
   function drawRect(x, y, color) {
     ctx.fillStyle = color;
     ctx.fillRect(x, y, gridSize, gridSize);
   }
 
+  // Desenha todas as partes de uma cobra
   function drawSnake(arr, color) {
     arr.forEach(p => drawRect(p.x, p.y, color));
   }
 
+  // Desenha a comida na tela
   function drawFood() {
     drawRect(food.x, food.y, 'red');
   }
 
+  // Atualiza a exibição da pontuação
   function updateScore() {
     scoreEl.textContent = `${playerName}: ${score} | Computador: ${compScore}`;
   }
 
+  // Posiciona nova comida em local aleatório que não conflite com as cobras
   function placeFood() {
     do {
       food = {
@@ -66,6 +72,7 @@
     );
   }
 
+  // Movimenta a cobra e verifica se comeu a comida
   function move(arr, dir) {
     const newHead = { x: arr[0].x + dir.x, y: arr[0].y + dir.y };
     arr.unshift(newHead);
@@ -77,6 +84,7 @@
     return false;
   }
 
+  // Verifica colisões com bordas e com o próprio corpo
   function checkCollision(arr) {
     const head = arr[0];
     return head.x < 0 || head.y < 0 ||
@@ -84,10 +92,12 @@
            arr.slice(1).some(p => p.x === head.x && p.y === head.y);
   }
 
+  // Verifica colisão entre as duas cobras
   function checkSnakeCollision(snakeA, snakeB) {
     return snakeB.some(p => p.x === snakeA[0].x && p.y === snakeA[0].y);
   }
 
+  // Inteligência artificial da cobra computador (busca a comida)
   function computerAI() {
     const head = computerSnake[0];
     const dirs = [
@@ -111,6 +121,7 @@
     }
   }
 
+  // Salva pontuação no ranking (armazenamento local do navegador)
   function saveRanking() {
     ranking.push({ name: playerName, score });
     ranking.sort((a, b) => b.score - a.score);
@@ -118,6 +129,7 @@
     localStorage.setItem('ranking', JSON.stringify(ranking));
   }
 
+  // Exibe os 5 melhores scores
   function showRanking() {
     rankingList.innerHTML = '';
     ranking.forEach((item, i) => {
@@ -127,6 +139,7 @@
     });
   }
 
+  // Finaliza o jogo e mostra resultado
   function endGame(msg) {
     clearInterval(gameInterval);
     document.removeEventListener('keydown', handleKeyDown);
@@ -136,12 +149,13 @@
     restartBtn.style.display = 'block';
   }
 
+  // Inicializa novo jogo
   function initGame() {
     document.addEventListener('keydown', handleKeyDown);
     playerName = playerNameIn.value.trim() || "Jogador";
-    snake = [{ x: 200, y: 200 }];
-    computerSnake = [{ x: 100, y: 100 }];
-    direction = { x: 0, y: -gridSize };
+    snake = [{ x: 200, y: 200 }]; // Posição inicial da cobra jogador
+    computerSnake = [{ x: 100, y: 100 }]; // Posição inicial da cobra computador
+    direction = { x: 0, y: -gridSize }; // Direção inicial
     compDirection = { x: 0, y: gridSize };
     score = compScore = 0;
     placeFood();
@@ -149,16 +163,18 @@
     gameInterval = setInterval(loop, gameSpeed);
   }
 
+  // Loop principal do jogo (atualização contínua)
   function loop() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     drawFood();
-    drawSnake(snake, 'lime');
-    drawSnake(computerSnake, 'blue');
+    drawSnake(snake, 'lime'); // Cobra jogador em verde
+    drawSnake(computerSnake, 'blue'); // Cobra computador em azul
 
-    if (move(snake, direction)) score++;
-    computerAI();
-    if (move(computerSnake, compDirection)) compScore++;
+    if (move(snake, direction)) score++; // Movimenta jogador
+    computerAI(); // Calcula movimento do computador
+    if (move(computerSnake, compDirection)) compScore++; // Movimenta computador
 
+    // Verifica todas condições de fim de jogo
     if (checkCollision(snake)) return endGame(`${playerName} perdeu!`);
     if (checkCollision(computerSnake)) return endGame(`Computador perdeu!`);
     if (checkSnakeCollision(snake, computerSnake)) return endGame(`${playerName} colidiu com o Computador!`);
@@ -167,6 +183,7 @@
     updateScore();
   }
 
+  // Controles de interface (iniciar/reiniciar)
   startBtn.addEventListener('click', () => {
     startScreen.style.display = 'none';
     gameArea.style.display = 'block';
@@ -181,5 +198,6 @@
     document.removeEventListener('keydown', handleKeyDown);
   });
 
+  // Exibe ranking ao carregar
   showRanking();
 })();
